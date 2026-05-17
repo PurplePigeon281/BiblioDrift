@@ -1843,6 +1843,12 @@ def get_price_history(book_id):
         history = price_tracker.get_price_history(book_id=book.id, retailer=retailer, limit=limit)
         latest_prices = price_tracker.get_latest_prices(book.id)
         
+        # If no history exists, fetch the current price and record it
+        if not history and not latest_prices:
+            price_tracker.update_prices_for_book(book.id, book.google_books_id)
+            history = price_tracker.get_price_history(book_id=book.id, retailer=retailer, limit=limit)
+            latest_prices = price_tracker.get_latest_prices(book.id)
+        
         return jsonify({
             "book_id": book.id,
             "google_books_id": book.google_books_id,

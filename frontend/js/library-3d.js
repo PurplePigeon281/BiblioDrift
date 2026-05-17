@@ -1349,6 +1349,153 @@ spine.addEventListener('blur', () => this.hideTooltip());
         if (actionsSection && reviewsSection && actionsSection.nextElementSibling !== reviewsSection) {
             reviewsSection.parentNode.insertBefore(actionsSection, reviewsSection);
         }
+        
+        // 8. Price Tracker Setup
+        const priceTrackerSection = document.getElementById('modal-price-tracker-section');
+        if (priceTrackerSection) {
+            // Reset state
+            priceTrackerSection.style.display = 'none';
+            const priceLatest = document.getElementById('modal-price-latest');
+            const authPrompt = document.getElementById('modal-price-auth-prompt');
+            const priceControls = document.getElementById('modal-price-controls');
+            const targetInput = document.getElementById('modal-price-target');
+            const setBtn = document.getElementById('modal-price-set-btn');
+            const activeAlert = document.getElementById('modal-price-active-alert');
+            const activeTarget = document.getElementById('modal-price-active-target');
+            const removeBtn = document.getElementById('modal-price-remove-btn');
+            
+            priceLatest.textContent = '';
+            authPrompt.style.display = 'none';
+            priceControls.style.display = 'none';
+            activeAlert.style.display = 'none';
+            
+            // Only show price tracker for books on the wishlist ("want" shelf)
+            const currentShelf = this.findBookShelf(book.id);
+            const localBook = window.libManager && typeof window.libManager.findBook === 'function' ? window.libManager.findBook(book.id) : null;
+            const shelfItemId = localBook ? localBook.db_id : null;
+
+            if (currentShelf === 'want' && shelfItemId) {
+                priceTrackerSection.style.display = 'block';
+                
+                const isLoggedIn = window.SafeStorage ? window.SafeStorage.get('isLoggedIn') === 'true' : false;
+                if (!isLoggedIn) {
+                    authPrompt.style.display = 'block';
+                } else {
+                    priceControls.style.display = 'block';
+                    
+                    const fetchPriceData = async () => {
+                        try {
+                            const headers = window.libManager ? window.libManager.getAuthHeaders() : new Headers();
+                            const priceRes = await fetch(`${MOOD_API_BASE}/books/${book.id}/prices`, {
+                                headers, credentials: 'include'
+                            });
+                            if (priceRes.ok) {
+                                const data = await priceRes.json();
+                                if (data.latest_prices && data.latest_prices.length > 0) {
+                                    const latest = data.latest_prices[0];
+                                    priceLatest.textContent = `Current: $${latest.price}`;
+                                } else {
+                                    priceLatest.textContent = 'Price: N/A';
+                                }
+                            }
+                            
+                            const alertsRes = await fetch(`${MOOD_API_BASE}/alerts`, {
+                                headers, credentials: 'include'
+                            });
+                            if (alertsRes.ok) {
+                                const alertsData = await alertsRes.json();
+                                const bookAlert = alertsData.alerts ? alertsData.alerts.find(a => a.shelf_item_id === shelfItemId && a.is_active) : null;
+                                if (bookAlert) {
+                                    activeAlert.style.display = 'flex';
+                                    activeTarget.textContent = `$${bookAlert.target_price}`;
+                                    activeAlert.dataset.alertId = bookAlert.id;
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Failed to fetch price data', err);
+                        }
+                    };
+                    
+                    fetchPriceData();
+                    
+                    const newSetBtn = setBtn.cloneNode(true);
+                    setBtn.parentNode.replaceChild(newSetBtn, setBtn);
+                    newSetBtn.addEventListener('click', async () => {
+                        const targetPrice = parseFloat(targetInput.value);
+                        if (!targetPrice || isNaN(targetPrice)) {
+                            alert("Please enter a valid target price.");
+                            return;
+                        }
+                        
+                        const headers = window.libManager ? window.libManager.getAuthHeaders() : new Headers();
+                        const user = window.libManager ? window.libManager.getUser() : null;
+                        if (!user) return;
+                        
+                        const originalHTML = newSetBtn.innerHTML;
+                        newSetBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Setting...';
+                        newSetBtn.disabled = true;
+                        
+                        try {
+                            const res = await fetch(`${MOOD_API_BASE}/books/${book.id}/alert`, {
+                                method: 'POST',
+                                headers,
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    user_id: user.id,
+                                    shelf_item_id: shelfItemId,
+                                    target_price: targetPrice
+                                })
+                            });
+                            
+                            if (res.ok) {
+                                const data = await res.json();
+                                targetInput.value = '';
+                                activeAlert.style.display = 'flex';
+                                activeTarget.textContent = `$${targetPrice}`;
+                                activeAlert.dataset.alertId = data.alert.id;
+                            } else {
+                                const err = await res.json();
+                                alert(err.error || "Failed to set alert.");
+                            }
+                        } catch (error) {
+                            console.error("Alert setting failed", error);
+                            alert("Network error.");
+                        } finally {
+                            newSetBtn.innerHTML = originalHTML;
+                            newSetBtn.disabled = false;
+                        }
+                    });
+                    
+                    const newRemoveBtn = removeBtn.cloneNode(true);
+                    removeBtn.parentNode.replaceChild(newRemoveBtn, removeBtn);
+                    newRemoveBtn.addEventListener('click', async () => {
+                        const alertId = activeAlert.dataset.alertId;
+                        if (!alertId) return;
+                        
+                        const headers = window.libManager ? window.libManager.getAuthHeaders() : new Headers();
+                        
+                        try {
+                            const res = await fetch(`${MOOD_API_BASE}/alerts/${alertId}`, {
+                                method: 'DELETE',
+                                headers,
+                                credentials: 'include'
+                            });
+                            
+                            if (res.ok) {
+                                activeAlert.style.display = 'none';
+                                activeAlert.dataset.alertId = '';
+                            } else {
+                                alert("Failed to remove alert.");
+                            }
+                        } catch (error) {
+                            console.error("Alert removal failed", error);
+                            alert("Network error.");
+                        }
+                    });
+                }
+            }
+        }
+
 
         if (shelfSelect) {
             shelfSelect.setAttribute('aria-label', 'Move book to shelf');
