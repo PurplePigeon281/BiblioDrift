@@ -1253,7 +1253,7 @@ main {
 
 /* Preview & Secondary buttons aligned with primary style */
 .btn-preview,
-.modal-share-btn {
+.btn-secondary {
     min-height: 44px;
     min-width: 120px;
     padding: 0.7rem 1rem;
@@ -1276,12 +1276,13 @@ main {
     border-color: var(--accent-gold);
 }
 
-.modal-share-btn {
+.btn-secondary {
     background: transparent;
     border: 1px solid var(--glass-border);
+    color: var(--text-main);
 }
 
-.modal-share-btn:hover {
+.btn-secondary:hover {
     background: rgba(0,0,0,0.04);
     transform: translateY(-1px);
 }
@@ -1289,7 +1290,7 @@ main {
 /* Accessible focus outlines */
 .btn-primary:focus-visible,
 .btn-preview:focus-visible,
-.modal-share-btn:focus-visible {
+.btn-secondary:focus-visible {
     outline: 3px solid rgba(212,175,55,0.18);
     outline-offset: 3px;
 }
