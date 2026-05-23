@@ -1891,3 +1891,32 @@ html[data-theme='night'] body.landing-page {
 html[data-theme='night'] .landing-header {
     background: rgba(26, 21, 18, 0.92);
 }
+
+html[data-theme='night'] .landing-card,
+html[data-theme='night'] .metric-card,
+html[data-theme='night'] .contributor-card,
+html[data-theme='night'] .contributors-panel,
+html[data-theme='night'] .footer-grid,
+html[data-theme='night'] .footer-banner,
+html[data-theme='night'] .quote-card,
+html[data-theme='night'] .workflow-step {
+    background: rgba(255, 255, 255, 0.05);
+}
+html[data-theme='night'] .feature-card i,
+html[data-theme='night'] .carousel-btn,
+html[data-theme='night'] .contributors-toggle,
+html[data-theme='night'] .social-links a,
+html[data-theme='night'] .landing-anchors a,
+html[data-theme='night'] .contributors-refresh-note,
+html[data-theme='night'] .contributor-item,
+html[data-theme='night'] .footer-pill,
+html[data-theme='night'] .landing-icon-btn,
+html[data-theme='night'] .btn-ghost {
+    background: rgba(255, 255, 255, 0.1);
+}
+html[data-theme='night'] .social-links a:hover,
+html[data-theme='night'] .landing-anchors a:hover,
+html[data-theme='night'] .landing-icon-btn:hover,
+html[data-theme='night'] .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
