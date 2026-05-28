@@ -146,40 +146,40 @@
                 </div>
         </section>
 
-        <!-- Reading Streak Section -->
+        <!-- Reading Streak (cozy GitHub-style heatmap) -->
         <section class="reading-streak-section">
-            <div class="streak-header">
-                <h2>Your Reading Journey</h2>
-                <div class="streak-stats">
-                    <div class="stat-box current-streak">
-                        <i class="fa-solid fa-fire"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="current-streak-val">0</span>
-                            <span class="stat-label">Day Streak</span>
-                        </div>
+            <div class="reading-streak-card">
+                <div class="reading-streak-header">
+                    <div class="reading-streak-title">
+                        <i class="fa-solid fa-fire" aria-hidden="true"></i>
+                        <h2>Reading Streak</h2>
                     </div>
-                    <div class="stat-box max-streak">
-                        <i class="fa-solid fa-trophy"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="max-streak-val">0</span>
-                            <span class="stat-label">Longest Streak</span>
+
+                    <div class="reading-streak-stats">
+                        <div class="reading-streak-stat">
+                            <div class="reading-streak-stat-value" id="reading-streak-current">0</div>
+                            <div class="reading-streak-stat-label">Current</div>
                         </div>
-                    </div>
-                    <div class="stat-box total-read">
-                        <i class="fa-solid fa-book-open"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="total-books-val">0</span>
-                            <span class="stat-label">Books Read</span>
+                        <div class="reading-streak-stat">
+                            <div class="reading-streak-stat-value" id="reading-streak-longest">0</div>
+                            <div class="reading-streak-stat-label">Longest</div>
                         </div>
                     </div>
                 </div>
+
+                <div class="reading-streak-heatmap-wrap">
+                    <div class="reading-streak-heatmap-toolbar">
+                        <button id="reading-streak-mark-today" class="reading-streak-btn" type="button" aria-label="Mark today as read">
+                            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                            <span>Mark Today as Read</span>
+                        </button>
+                    </div>
+
+                    <div class="reading-streak-scroll" role="region" aria-label="Reading streak heatmap">
+                        <div id="reading-streak-calendar" class="reading-streak-calendar"></div>
+                    </div>
+                </div>
             </div>
-            
-            <!-- Calendar container -->
-            <div id="streak-calendar-container" class="streak-calendar">
-                <!-- D3 Calendar gets injected here -->
-            </div>
-            <div class="calendar-tooltip" id="calendar-tooltip" style="opacity: 0;"></div>
         </section>
 
         <!-- 3D Bookshelf Container -->
